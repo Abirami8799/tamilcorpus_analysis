@@ -1,0 +1,8 @@
+{% extends 'names.html'%}
+    {% block search %}
+    <form action="grantha_words" method="POST">
+    {% csrf_token %}
+     <input class="{{status_n}}" style="margin: 10px 15px 15px 5px;" type="submit"  value="சொற்கள் ({{count_n}})" id="show1" name='res4'>    
+    <input class="{{status_g}}" style="margin: 10px 15px 15px 5px;" type="submit" value="கிரந்த சொற்கள் ({{count_g}})" id="show2" name='res3'/>
+    </form>   
+    {% endblock %}

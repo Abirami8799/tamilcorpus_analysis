@@ -1,0 +1,38 @@
+::placeholder{
+            text-align: center;
+        }
+body { 
+            background:lightgray !important;
+         } 
+input[type=text]{
+	 border: 1px solid rgb(71, 72, 73);
+         border-radius: 4px;
+         width: 75%;
+	 height: 35px;
+        }
+.start_letter, .end_letter, .word_length{
+        display: block;
+        padding: 10px;
+       }
+.container{
+       padding: 10px;
+       text-align: center;
+       position: relative;
+       }
+.checkbox1{
+      padding: 10px;
+       }
+.result{
+        height: 400px;
+        border: 2px solid rgb(71, 72, 73);
+        overflow-y: auto;
+        border-radius: 12px;
+        background: white;
+     }
+.container_2{
+     padding: 20px;
+     margin: auto;
+     width: 75%;
+   }
+     
+

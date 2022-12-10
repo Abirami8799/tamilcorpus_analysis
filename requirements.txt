@@ -1,0 +1,16 @@
+asgiref==3.4.1
+dj-database-url==0.5.0
+dj-static==0.0.6
+Django==3.2.5
+django-heroku==0.3.1
+docopt==0.6.2
+gitignore==0.0.8
+gunicorn==20.1.0
+Open-Tamil==1.1
+psycopg2-binary==2.9.5
+pystache==0.6.0
+pytz==2021.1
+sqlparse==0.4.1
+static==1.1.1
+static3==0.7.0
+whitenoise==5.3.0

@@ -1,0 +1,70 @@
+
+{% extends 'base.html'%}   
+  {% block word %}
+      
+    <div class="row justify-content-center" id="tabRow">        
+      <div class="col-12 col-md-10 col-lg-8 mt-3">
+          <div class="row">
+             <div class="col-12 col-md-8 text-center">
+               {% block search %}
+              
+              {% endblock %}
+   	      </div>
+           
+         <div class ="col-12 col-md-4 text-center">
+              <form action="{% url 'download' %}" method="POST">
+                {% csrf_token %}
+                  <input class="btn btn-lg btn-success" style="margin: 20px 5px 15px 5px"type="submit" name = {{data1}} id = 'show3' value="DOWNLOAD"/>
+              </form>
+            </div> 
+          </div>
+        	
+             
+        <div class="tab-content" id="myTabContent">          
+          {% for i in data %}
+            <!-- <div class="tab-pane fade p-0 show active" id="t0-tab-pane" role="tabpanel" aria-labelledby="t0-tab" tabindex="0">. -->
+              <div class="card border-0 rounded-0 border-start shadow-sm position-relative mb-1" data-id="200">
+                <ul class="list-group list-group-light">
+                  <div class="card-body">
+                    <i class="list-group-item px-3 border-0">
+                      <span style="font-size:small;" class="fst-italic">  {{i.words}} </span>
+                    </i> 
+                  </div>
+                  <div class="like position-absolute top-0 end-0">
+                    <button class="btn btn-success btn-sm copy-btn" data-hex={{i.words}}><i class="fa fa-copy" ></i></button>
+                  </div>
+                </ul>                  
+              </div>
+            <!-- </div> -->
+          {% endfor %}  
+        </div>
+      </div>
+    </div>
+
+<script > 
+  const copyBtns = [...document.getElementsByClassName('copy-btn')] 
+  console.log(copyBtns)
+  let previous = null
+  copyBtns.forEach(btn=> btn.addEventListener('click', ()=>{
+    // console.log('click')
+    // let previous = null
+    const color = btn.getAttribute('data-hex')
+    // console.log(color) 
+    // console.log(btn) 
+    navigator.clipboard.writeText(color)
+    btn.style.background = "gray"
+
+    if (previous){      
+      previous.style.background = "#198754"      
+    }
+    previous = btn
+    
+   
+  }))
+
+</script> 
+      
+
+{% endblock %}
+    
+ 

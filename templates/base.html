@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>தமிழ் சொற்றொகுதி</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
+    <link rel='stylesheet' id='gfonts-css'  href='https://fonts.googleapis.com/icon?family=DM+Sans:wght@500;700&display=swap' type='text/css' media='all' />
+    <link rel='stylesheet' id='bsico-css'  href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css' type='text/css' media='all' />
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js' id='jquery-js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style type="text/css">
+      .icon-blue{color:#2196f3;font-size: larger;font-weight:bold;}
+      .icon-pink{color:#9c27b0;font-size: larger;font-weight:bold;}
+      .border-blue{border-color:#9c27b0 !important;border-width:2px;}
+      .border-pink{border-color:#2196f3 !important;border-width:2px;}
+      .rd{display: block;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+      border-radius: 0.375rem;border: 1px solid #ced4da;
+      position: relative;
+      flex: 1 1 auto;
+      width: 1%;
+      min-width: 0;}
+      .chkbox:checked {
+      background-color: #198754;
+      border-color:#198754;
+      }
+      .nav-pills .nav-link{
+        background-color: #e9ecef;
+        color: #000;
+      }
+      .nav-pills .nav-link.active{
+        background-color: #198754;
+        border-color:#198754;
+        color: #fff;
+      }
+      @media (max-width: 575.98px) {
+      #brandName{font-size: small;}
+      #pgTitle{font-size:120%;font-weight:bold;}
+      }
+     
+    </style>
+  </head>
+  <body>
+    
+    
+    <div class="container-lg py-5">
+      <div class="row">
+        <div class="col-12">
+          <h1 id="pgTitle" align="center">தமிழ் சொற்றொகுதி</h1>
+          <p align="center">விரும்பிய எழுத்துக்களை உள்ளிடுக</p>
+        </div>
+      </div>
+      <form action="tamil_words"  method="POST" >
+        {% csrf_token %}
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-4">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="qs">முதல்</label>
+              <input type="text" id="qs" name="start"class="form-control" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="க or க,ம or த,வி,மெ" data-bs-placement="bottom" tabindex="1">
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="qe">கடை</label>
+              <input type="text" id="qe" name ="end" class="form-control" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="க or க,ம or த,வி,மெ" data-bs-placement="bottom" tabindex="3">
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="qe">நீளம்</label>
+              <input type="text" id="qe" name="length" class="form-control" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="1,2,3...19,20" data-bs-placement="bottom" tabindex="3">
+            </div>
+          </div>
+        </div>
+      
+        <div class="row"> 
+          <div class="col-12 col-md-5">
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0 radio" type="radio"  id = "check" name="ck1"  value="0"  tabindex="4" >
+              </div>
+              <label class="input-group-text" for="qm">எழுத்து</label>
+              <input type="text" id="qe" class="form-control" data-bs-trigger="focus" name="words"  data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="ப or ண்,ழ் or ன,வி,னை" data-bs-placement="bottom" tabindex="3">
+              <label class="input-group-text" for="qm">இடம்</label>
+              <input type="text" id="qe" class="form-control" data-bs-trigger="focus" name="position"  data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="1,2,3...19,20"  data-bs-placement="bottom" tabindex="3">
+            </div>
+          </div>
+        
+          <div class="col-12 col-md-6">
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0 radio" type="radio" id="check"  name="ck1" value="0"  tabindex="4">
+              </div>
+              <label class="input-group-text" for="qs">இடை</label>
+              <input type="text" id="qs" name="contains" class="form-control" data-bs-trigger="focus" data-bs-toggle="popover" data-bs-title="உதாரணம்" data-bs-content="அழகு or குரு or மாசு" data-bs-placement="bottom" tabindex="1">
+            </div>
+          </div> 
+          
+        </div>
+        <div class="row">
+          <div class="col-12 text-center">
+          <button type="submit"  class="btn btn-lg btn-success"   tabindex="10" uhid="47"><i class="bi bi-search-heart"></i>Search</button>
+         
+          </div>
+        </div>
+        </div>
+        
+      </form>
+      
+      
+     
+      {% block word %}
+
+      {% endblock %}
+     
+    <script type="text/javascript">
+        jQuery(document).ready(function(){
+          jQuery("#cY").text(new Date().getFullYear());
+          const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+          const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl,{trigger: 'focus'}));
+          
+          jQuery("#TAlen").on("change",talenClick);
+          jQuery("#wlenplus").on("click",function(e){var n=jQuery("#wlen").val();jQuery("#wlen").val(parseInt(n)+1); });
+          jQuery("#wlenminus").on("click",function(e){var n=jQuery("#wlen").val(); jQuery("#wlen").val(parseInt(n)-1); })
+          jQuery("#wlen").trigger("change");
+
+        });
+        function talenClick(e){
+          if(jQuery(this).prop("checked") ){
+            /*jQuery("#wlen").removeClass("disabled").removeAttr("disabled").focus();*/
+            jQuery("#wlenplus,#wlenminus").removeClass("disabled").removeAttr("disabled");
+          }else{
+            jQuery("#wlenplus,#wlenminus").addClass("disabled").prop("disabled","disabled");
+          }
+        }
+
+        
+ 
+         
+    </script>
+  </body>
+</html>
