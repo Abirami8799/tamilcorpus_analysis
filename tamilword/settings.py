@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-egup54xa8b!+qz092xnz^)hri24v&m_tr9c94$j#d$yzr8za(z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','tamilwordgame.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
