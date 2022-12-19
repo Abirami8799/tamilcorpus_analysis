@@ -25,8 +25,8 @@ def FirstSearch(val1, val2, val3):
         
     elif (bool(val1) and bool(val2)):
         l = get_letters(val1)
-        m = get_letters(val2)
-        data = Demo.objects.filter(start_letter__icontains = val1[0],end_letter_icontains = val2[-1]).filter(words__startswith=val1,words__endswith=val2, length__lte = 20).values('words')
+        m = get_letters(val2)_
+        data = Demo.objects.filter(start_letter__icontains = val1[0],end_letter__icontains = val2[-1]).filter(words__startswith=val1,words__endswith=val2, length__lte = 20).values('words')
         s= word_startswith(l,data)   
         data1 = word_endswith(m, s)
         filename = 'Starts_'+val1+'_Ends_'+val2
