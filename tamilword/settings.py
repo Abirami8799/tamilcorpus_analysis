@@ -84,14 +84,13 @@ WSGI_APPLICATION = 'tamilword.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'xxx',
-        'USER': 'xxxx',
-        'PASSWORD': 'xxxx',
-        'HOST': 'xxxx',
+        'NAME': 'XXX',
+        'USER': 'XXX',
+        'PASSWORD': 'XXX',
+        'HOST': 'XXX',
         'PORT': '5432',
     }
 }
-
 
 #db_from_env = dj_database_url.config(conn_max_age=600)
 #DATABASES['default']= dj_database_url.config()

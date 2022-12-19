@@ -1,0 +1,132 @@
+
+
+Project url-  https://github.com/Abirami8799/tamilwordgame
+
+1. Install packages which are required for deploy the django project.
+
+sudo apt-get update
+sudo apt-get install python3-pip apache2 libapache2-mod-wsgi-py3
+
+2. Creating virtual environment 
+
+     1.	sudo apt-get install python3-pip
+
+     2.	sudo pip3 install virtualenv 
+        
+     3. Inside project folder create venv
+	abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ virtualenv venv
+
+     4. abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ source venv/bin/activate
+         
+        (venv)abirami@abirami-Lenovo-B490:~/Desktop/tamilword$
+
+ 	Then you can see requirements.txt file. I'll be updated all packages currently installed. Use the below command to install python package in virutual environment.
+
+     5.	(venv)abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ pip install -r requirements.txt
+
+3. We have to configure database details in project file. Go to folder tamilword/tamilword  open setting.py file.
+you should change database details instead of 'xxxx'.
+
+
+        
+        'NAME': 'xxx',
+        'USER': 'xxx',
+        'PASSWORD': 'xxx',
+        'HOST': 'xxx',
+        'PORT': '5432',
+
+4. let confirm everything is working by running Django’s local webserver.
+
+	(venv)abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ python3 manage.py runserver
+
+if you visit http://127.0.0.1:8000/  you can able to see web-application.
+
+
+5. Deactivate the virtual env using below command.
+
+	(venv)abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ deactivate
+         abirami@abirami-Lenovo-B490:~/Desktop/tamilword$
+
+6. Deploying Django Application on Apache Server
+
+	1. Let’s create a virtual host file. create text editor a .conf file using command
+
+	abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ sudo nano /etc/apache2/sites-available/djangoproject.conf
+
+	2. Add the following text to djangoproject.conf file and save the file:
+		Note: 1. 'user' to your username. To find your username use this command - whoami
+   	    	       
+	
+
+<VirtualHost *:80>
+	ServerAdmin admin@tamilcorpus.annai.no
+	ServerName tamilcorpus.annai.no
+	ServerAlias www.tamilcorpus.annai.no
+	DocumentRoot /home/user/tamilword
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	Alias /static /home/user/tamilword/static
+	<Directory /home/user/tamilword/static>
+		Require all granted
+	</Directory>
+
+	Alias /static /home/user/tamilword/media
+	<Directory /home/user/tamilword/media>
+		Require all granted
+	</Directory>
+
+	<Directory /home/user/tamilword/tamilword>
+		<Files wsgi.py>
+			Require all granted
+		</Files>
+	</Directory>
+
+	WSGIDaemonProcess tamilword python-path=/home/user/tamilword python-home=/home/user/tamilword/venv
+	WSGIProcessGroup tamilword
+	WSGIScriptAlias / /home/user/tamilword/tamilword/wsgi.py
+</VirtualHost>
+
+
+	3. Enable the Virtual Host File for Django Project
+
+		abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ cd /etc/apache2/sites-available
+            
+		abirami@abirami-Lenovo-B490:~/etc/apache2/sites-available $ sudo a2ensite djangoproject.conf
+
+		The above command will give output something like this –
+
+		Enabling site djangoproject.
+		To activate the new configuration, you need to run:
+		service apache2 reload
+
+	4. Some Permissions
+
+		abirami@abirami-Lenovo-B490:~/etc/apache2/sites-available $ sudo ufw allow 'Apache Full'
+
+	5. check your Apache files to make sure you did not make any syntax errors:
+
+		abirami@abirami-Lenovo-B490:~$ sudo apache2ctl configtest 
+		
+		It will output – Syntax OK 
+
+
+7.project setup:
+
+
+	1. go to tamilword/tamilword  open setting.py file. In the edit below like that
+
+		ALLOWED_HOSTS = ['tamilcorpus.annai.no']
+
+	2. cd tamilword/
+		Activate the Virtual Environment which have created previously
+
+	3. abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ source venv/bin/activate
+
+        4. (venv)abirami@abirami-Lenovo-B490:~/Desktop/tamilword$ python3 manage.py runserver
+
+	Quit the server with CONTROL-C. This will not stop the server from running. 
+
+	5 .sudo service apache2 restart
+
+     
