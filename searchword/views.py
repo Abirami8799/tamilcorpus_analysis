@@ -7,180 +7,223 @@ from .models import Demo
 from .basics import word_startswith, word_endswith, contains, grantha, position
 from django.views import View
 from django.utils.http import urlquote
+from django.db.models import Q
+import pandas as pd
+from django.shortcuts import redirect
+import json
+import time
+import dask.dataframe as dd
 
 
 def home(request):
-    return render(request,'base.html')
+    return render(request,'index.html')
 
 
-def FirstSearch(val1, val2, val3):
+
+def FirstSearch(val1, val2, val3, val4):
         
-    if (bool(val1) and bool(val2) and bool(val3)) and (len(val3) <=20):
-        l = get_letters(val1)
-        m = get_letters(val2)
-        data = Demo.objects.filter(start_letter__icontains =val1[0],end_letter__icontains= val2[-1]).filter(words__startswith=val1,words__endswith=val2,length__iexact=val3).values('words')
-        s= word_startswith(l,data)   
-        data1 = word_endswith(m, s)
-        filename = 'Starts_'+val1+'_Ends_'+val2+'_Length_'+val3
-        
-    elif (bool(val1) and bool(val2)):
-        l = get_letters(val1)
-        m = get_letters(val2)_
-        data = Demo.objects.filter(start_letter__icontains = val1[0],end_letter__icontains = val2[-1]).filter(words__startswith=val1,words__endswith=val2, length__lte = 20).values('words')
-        s= word_startswith(l,data)   
-        data1 = word_endswith(m, s)
-        filename = 'Starts_'+val1+'_Ends_'+val2
+    filters = Q()
+    if val1:
+        filters &= Q(words__startswith=val1)
+    if val2:
+        filters &= Q(words__endswith=val2)
+
+    if val3 and val3.isdigit() and int(val3) <= 20:
+        filters &= Q(length=int(val3))
+    else:
+        filters &= Q(length__lte=20)  
     
-    elif (bool(val2) and bool(val3)) and (int(val3)<=20):
-        l = get_letters(val2)
-        data = Demo.objects.filter(end_letter__icontains = val2[-1]).filter(words__endswith=val2,length__iexact=val3).values('words')
-        data1 = word_endswith(l,data)
-        filename = 'Ends_'+val2+'_Length_'+val3
-
-
-    elif (bool(val1) and bool(val3))and (int(val3)<=20):
-        l = get_letters(val1)
-        data = Demo.objects.filter(start_letter__icontains = val1[0]).filter(words__startswith=val1,length__iexact=val3).values('words')
-        data1 = word_startswith(l,data)
-        filename = 'Starts_'+val1+'_Length_'+val3
-
-
-    elif bool(val1):
-        l = get_letters(val1)
-        value = Demo.objects.filter(start_letter__icontains = val1[0]).filter(words__startswith=val1, length__lte = 20).values('words')
-        data1 = word_startswith(l,value)
-        filename = 'Starts_'+val1                    
+    if val4:
+        filters &= Q(words__icontains=val4)
         
 
-    elif bool(val2):
-        l = get_letters(val2)
-        value = Demo.objects.filter(end_letter__icontains = val2[-1]).filter(words__endswith=val2, length__lte = 20).values('words')
-        data1 = word_endswith(l,value)
-        filename = 'Ends_'+val2 
-    
+    # Query execution
+    data = Demo.objects.filter(filters).values('words')
 
-    elif bool(val3) and (int(val3) <=20):
-        data1 = Demo.objects.filter(length__iexact = val3).values('words')
-        filename = 'Length_'+val3
+    # Processing based on conditions
+    if val1 and val2 and val3 and val4:
+        data = word_startswith(get_letters(val1), data)
+        data = word_endswith(get_letters(val2), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Starts_{val1}_Ends_{val2}_Length_{val3}_Contains_{val4}'
     
-    return data1,filename
-
-def SecondSearch(val4):
+    elif val1 and val2 and val3:
+        data = word_startswith(get_letters(val1), data)
+        data = word_endswith(get_letters(val2), data)
+        filename = f'Starts_{val1}_Ends_{val2}_Length_{val3}'
     
-    l = get_letters(val4)
-    s = Demo.objects.filter(words__icontains=val4,length__lte = 20).values('words')  
-    data1 = contains(l, s)
-    filename = 'Contains_'+val4	
-    return data1,filename
+    elif val1 and val2 and val4:
+        data = word_startswith(get_letters(val1), data)
+        data = word_endswith(get_letters(val2), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Starts_{val1}_Ends_{val2}_Contains_{val4}'
 
+    elif val1 and val3 and val4:
+        data = word_startswith(get_letters(val1), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Starts_{val1}_Contains_{val4}_Length_{val3}'
+
+    elif val2 and val3 and val4:
+        data = word_endswith(get_letters(val2), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Ends_{val2}_Contains_{val4}_Length_{val3}'
+
+    elif val1 and val2:
+        data = word_startswith(get_letters(val1), data)
+        data = word_endswith(get_letters(val2), data)
+        filename = f'Starts_{val1}_Ends_{val2}'
+
+    elif val1 and val3:
+        data = word_startswith(get_letters(val1), data)
+        filename = f'Starts_{val1}_Length_{val3}'
+
+    elif val1 and val4:
+        data = word_startswith(get_letters(val1), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Starts_{val1}_Contains_{val4}'
+
+    elif val2 and val3:
+        data = word_endswith(get_letters(val2), data)
+        filename = f'Ends_{val2}_Length_{val3}'
+
+    elif val2 and val4:
+        data = word_endswith(get_letters(val2), data)
+        data = contains(get_letters(val4), data)
+        filename = f'Ends_{val2}_Contains_{val4}'
+
+    elif val3 and val4:
+        data = contains(get_letters(val4), data)
+        filename = f'Length_{val3}_Contains_{val4}'
+
+    elif val1:
+        data = word_startswith(get_letters(val1), data)
+        filename = f'Starts_{val1}'
+    
+    elif val2:
+        data = word_endswith(get_letters(val2), data)
+        filename = f'Ends_{val2}'
+    
+    elif val3:
+        filename = f'Length_{val3}'
+
+    elif val4:
+        data = contains(get_letters(val4), data)
+        filename = f'Contains_{val4}'    
+    return data,filename
 
 
 class GetTamilWord(View):
         
-    def post(self, request):            
-        val1=request.POST['start']      
-        val2=request.POST['end']        
-        val3= request.POST['length']
-        val4 =request.POST['contains']
-        val5 = request.POST['words']
-        val6 = request.POST['position']
-        
+    def post(self, request):  
 
-        if val1 or val2 or val3:
-            data1,filename =  FirstSearch(val1, val2, val3)
-            n_word, g_word = grantha(data1)
-            request.session['g_name'] = g_word  
-            request.session['n_name'] = n_word
-            request.session['filename'] = filename
-            if len(n_word) > 0 or len(g_word) > 0:
-                return render(request,'grantha.html',{'data': n_word, 'data1': 'res1',
-                'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-success','status_g':'btn btn-lg btn-secondary'})
-            else:
-                return render(request,'base.html')
+        if request.POST.get("search"):
+            val1=request.POST['start']      
+            val2=request.POST['end']        
+            val3= request.POST['length']
+            val4 =request.POST['contains']
 
-        elif bool(val4) and request.POST.get('ck1'):
-            data1,filename = SecondSearch(val4)
-            n_word, g_word = grantha(data1)
-            request.session['g_name'] = g_word  
-            request.session['n_name'] = n_word
-            request.session['filename'] = filename
-            if len(n_word) > 0 or len(g_word) > 0:          
-               return render(request,'grantha.html',{'data': n_word, 'data1': 'res1',
-            'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-success','status_g':'btn btn-lg btn-secondary'})
+            if val1 or val2 or val3 or val4:
+                data1,filename =  FirstSearch(val1, val2, val3, val4)
+                n_word, g_word = grantha(data1)
+                request.session['g_name'] = g_word  
+                request.session['n_name'] = n_word
+                request.session['start'] = val1
+                request.session['end'] = val2
+                request.session['length'] = val3
+                request.session['contains'] = val4
+                request.session['filename'] = filename
+                request.session['data1'] = 'res4'
+                if len(n_word) > 0 or len(g_word) > 0:
+                    return render(request,'names.html',{'data': n_word, 'start': val1,'end':val2, 'length':val3,'contains':val4,
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
+                else:
+                    return redirect('home')
             else:
-                return render(request,'base.html')
-        elif val5 and val6 and request.POST.get('ck1'):
-            s = Demo.objects.filter(words__icontains=val5, length__range = (val6,20)).values('words') 
-            data1 = position(val5, val6, s)
-            n_word, g_word = grantha(data1)
-            request.session['g_name'] = g_word  
-            request.session['n_name'] = n_word
-            request.session['filename'] = 'Letter_'+val5+'_position_'+val6
-            if len(n_word) > 0 or len(g_word) > 0:           
-               return render(request,'grantha.html',{'data': n_word, 'data1': 'res1', 
-            'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-success','status_g':'btn btn-lg btn-secondary'})
-            else:
-                return render(request,'base.html')
-        else:
-            return render(request, 'base.html')
+                return redirect('home')
+                    
 
+        if request.POST.get("search2"):
+            words_dict = {key: value for key, value in request.POST.items() if key.startswith("words[")}
+            if bool(len(words_dict)) and (int(len(words_dict)) <=20):
+                data1 = Demo.objects.filter(length = len(words_dict)).values('words')
+                df = pd.DataFrame(list(data1))
+                df = dd.from_pandas(df, npartitions=4)
+                filtered_dict = {int(k.strip('words[]'))-1: v for k, v in words_dict.items() if v != ''}
+
+                df['letters'] = df['words'].map(get_letters, meta=('x', 'object'))
+
+                for i in range(7):
+                    df[f'col_{i}'] = df['letters'].map(lambda x, idx=i: x[idx] if len(x) > idx else '', meta=('x', 'object'))
+
+                for i, val in filtered_dict.items():
+                    df = df[df[f'col_{i}'] == val]
+
+                data2 = []
+                for part in df[['words']].partitions:
+                    data2.extend(part.compute().to_dict(orient='records'))
+
+                n_word, g_word = grantha(data2)
+                filename = f'Length_{len(words_dict)}_{'_'.join(f"{k}_{v}" for k, v in words_dict.items() if v != '')}'
+                request.session['g_name'] = g_word  
+                request.session['n_name'] = n_word
+                request.session['filename'] = filename
+                request.session['words_dict'] = words_dict
+                request.session['bx_val'] = len(words_dict)
+                request.session['data1'] = 'res4'
+                if len(n_word) > 0 or len(g_word) > 0:
+                    return render(request,'names.html',{'data': n_word, 'data1': 'res1', 'words_dict': words_dict,'bx_val': len(words_dict),
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
+                else:
+                    return redirect('home')
+
+            else:
+                return redirect('home')
+            
+        if request.POST.get('res3') or request.POST.get('res4'):  
+            g_word = request.session['g_name']
+            n_word = request.session['n_name'] 
+            val1 = request.session['start']
+            val2 = request.session['end']
+            val3 = request.session['length']
+            val4 = request.session['contains'] 
+            words_dict= request.session['words_dict']
+            bx_val = request.session['bx_val']
+
+            if request.POST.get('res3'):
+                request.session['data1'] ='res3'
+                if len(g_word) > 0:                
+                    return render(request,'names.html',{'data':g_word, 'start': val1,'end':val2, 'length':val3,'contains':val4,  'words_dict': words_dict,'bx_val': bx_val,
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-secondary','status_g':'btn btn-sm btn-cl1'})
+                else:
+                    return render(request,'names.html', {'start': val1,'end':val2, 'length':val3,'contains':val4, 'words_dict': words_dict,'bx_val': bx_val,
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-secondary','status_g':'btn btn-sm btn-cl1'})
+            
+            elif request.POST.get('res4'):
+                request.session['data1'] = 'res4'       
+                if len(n_word) > 0:                
+                    return render(request,'names.html',{'data':n_word, 'start': val1,'end':val2, 'length':val3,'contains':val4, 'words_dict': words_dict,'bx_val': bx_val,
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
+                else:
+                    return render(request,'names.html', {'start': val1,'end':val2, 'length':val3,'contains':val4, 'words_dict': words_dict,'bx_val': bx_val,
+                    'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
      
-         
 
-class GetGranthaWord(View):
+        elif request.POST.get('download'):
+            g_word = request.session.get('g_name')
+            n_word = request.session.get('n_name')
+            data1 = request.session.get('data1')
+            filename = request.session.get('filename', 'download')
+            response = HttpResponse(content_type="text/plain")
+            response['Content-Disposition'] = f'attachment; filename={urlquote(filename)}.txt'
 
-    def post(self, request):
-        g_word = request.session['g_name']
-        n_word = request.session['n_name']  
-        if request.POST.get('res3'):              
-            if len(g_word) > 0:                
-                return render(request,'grantha.html',{'data':g_word, 'data1': 'res3',
-                'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-secondary','status_g':'btn btn-lg btn-success'})
-            else:
-                return render(request,'grantha.html',
-                {'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-secondary','status_g':'btn btn-lg btn-success'})
-        elif request.POST.get('res4'):            
-            if len(n_word) > 0:                
-                return render(request,'grantha.html',{'data':n_word, 'data1': 'res4',
-                'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-success','status_g':'btn btn-lg btn-secondary'})
-            else:
-                return render(request,'grantha.html',
-                {'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-lg btn-success','status_g':'btn btn-lg btn-secondary'})
+            lines = []
+            word_list = g_word if data1 == 'res3' else n_word
+            for i in word_list:
+                word = i.get('words')
+                lines.append(f'{word}\n')
+            response.writelines(lines)
+            return response
 
         else:
-            return render(request, 'base.html')
-
-def download(request): 
-    
-    if request.POST.get('res1') or request.POST.get('res4'):
-        filename = request.session['filename']        
-        response = HttpResponse(content_type = 'text\plain')
-        response['Content-Disposition'] =  "attachment; filename={}".format(urlquote(filename+'.txt'))
-        n_word = request.session['n_name']   
-        lines=[]
-        for i in n_word:
-            word = i.get('words')
-            lines.append(f'{word}\n')
-
-        response.writelines(lines)
-        return response
-    elif request.POST.get('res3'):
-        filename = request.session['filename'] 
-        response = HttpResponse(content_type = 'text\plain')
-        response['Content-Disposition'] =  'attachment; filename={}'.format(urlquote(filename+'.txt'))
-        g_word = request.session['g_name']   
-        lines=[]
-        for i in g_word:
-            word = i.get('words')
-            lines.append(f'{word}\n')
-
-        response.writelines(lines)
-        return response
-    else:
-        response = HttpResponse(content_type = 'text\plain')
-        response['Content-Disposition'] =  'attachment; filename= empty.txt' 
-        lines=[]
-        response.writelines(lines)
-        return response
-        
+            return redirect('home')         
 
