@@ -137,14 +137,14 @@ class GetTamilWord(View):
                     return render(request,'names.html',{'data': n_word, 'start': val1,'end':val2, 'length':val3,'contains':val4,
                     'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
                 else:
-                    return redirect('home')
+                    return render(request, 'index.html',{'start': val1,'end':val2, 'length':val3,'contains':val4,"msg":"கொடுக்கப்பட்ட உள்ளீட்டிற்கு ஏற்ப எந்தவொரு வெளியீடும் கிடைக்கவில்லை."})
             else:
-                return redirect('home')
+                return render(request, 'index.html',{"msg":"தயவு செய்து உள்ளீட்டை அளிக்கவும்."})
                     
 
         if request.POST.get("search2"):
             words_dict = {key: value for key, value in request.POST.items() if key.startswith("words[")}
-            if bool(len(words_dict)) and (int(len(words_dict)) <=20):
+            if bool(len(words_dict)) and (int(len(words_dict)) <=20) and (not all(value == '' for value in words_dict.values())):
                 data1 = Demo.objects.filter(length = len(words_dict)).values('words')
                 df = pd.DataFrame(list(data1))
                 df = dd.from_pandas(df, npartitions=4)
@@ -174,10 +174,10 @@ class GetTamilWord(View):
                     return render(request,'names.html',{'data': n_word, 'data1': 'res1', 'words_dict': words_dict,'bx_val': len(words_dict),
                     'count_n':len(n_word),'count_g':len(g_word),'status_n':'btn btn-sm btn-cl1','status_g':'btn btn-lg btn-secondary'})
                 else:
-                    return redirect('home')
+                    return render(request, 'index.html',{'words_dict': words_dict,'bx_val': len(words_dict),"msg":"கொடுக்கப்பட்ட உள்ளீட்டிற்கு ஏற்ப எந்தவொரு வெளியீடும் கிடைக்கவில்லை."})
 
             else:
-                return redirect('home')
+                return render(request, 'index.html',{"msg":"தயவு செய்து உள்ளீட்டை அளிக்கவும்."})
             
         if request.POST.get('res3') or request.POST.get('res4'):  
             g_word = request.session['g_name']
