@@ -2,15 +2,13 @@ from django.urls import path
 from django.urls.resolvers import URLPattern
 from . import views
 from django.contrib import admin  
-from  searchword.views import GetTamilWord, GetGranthaWord, download
+from  searchword.views import GetTamilWord
 
 
 
 urlpatterns=[
-    path('',views.home),
-    path('tamil_words',GetTamilWord.as_view(), name='wordgame'),
-    path('grantha_words',GetGranthaWord.as_view(), name='wordgame1'),
-    path('download', views.download, name='download')
+    path('',views.home, name='home'),
+    path('search/',GetTamilWord.as_view(), name='wordgame')
 ]
 
 

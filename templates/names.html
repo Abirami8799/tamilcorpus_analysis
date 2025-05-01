@@ -1,70 +1,66 @@
 
-{% extends 'base.html'%}   
+{% extends 'index.html'%}   
   {% block word %}
-      
-    <div class="row justify-content-center" id="tabRow">        
-      <div class="col-12 col-md-10 col-lg-8 mt-3">
+
+  
+  <div class="row justify-content-center" id="tabRow">        
+    <div class="col-12 col-md-10 col-lg-8 mt-3">
+<div class="row">
+    <div class="col-12 py-5">
+      <div class="card border-2">
+        <div class="card-header">
+          <h4 class="mb-0" align="center" lang="ta">
+            சொற்கள் தேடுகை 
+          </h4>
+        </div> 
+        
           <div class="row">
-             <div class="col-12 col-md-8 text-center">
-               {% block search %}
-              
-              {% endblock %}
-   	      </div>
-           
-         <div class ="col-12 col-md-4 text-center">
-              <form action="{% url 'download' %}" method="POST">
-                {% csrf_token %}
-                  <input class="btn btn-lg btn-success" style="margin: 20px 5px 15px 5px"type="submit" name = {{data1}} id = 'show3' value="DOWNLOAD"/>
-              </form>
-            </div> 
-          </div>
-        	
-             
-        <div class="tab-content" id="myTabContent">          
-          {% for i in data %}
-            <!-- <div class="tab-pane fade p-0 show active" id="t0-tab-pane" role="tabpanel" aria-labelledby="t0-tab" tabindex="0">. -->
-              <div class="card border-0 rounded-0 border-start shadow-sm position-relative mb-1" data-id="200">
-                <ul class="list-group list-group-light">
-                  <div class="card-body">
-                    <i class="list-group-item px-3 border-0">
-                      <span style="font-size:small;" class="fst-italic">  {{i.words}} </span>
-                    </i> 
-                  </div>
-                  <div class="like position-absolute top-0 end-0">
-                    <button class="btn btn-success btn-sm copy-btn" data-hex={{i.words}}><i class="fa fa-copy" ></i></button>
-                  </div>
-                </ul>                  
+              <div class="col-12 col-md-8 text-center">
+                 <input class="{{ status_n }}" style="margin: 10px 15px 15px 5px; width: 250px; height: 45px; font-size: 16px; text-align: center;" type="submit" value="சொற்கள் ({{ count_n }})" id="show1" name="res4" />             
+                 <input class="{{ status_g }}" style="margin: 10px 15px 15px 5px; width: 250px; height: 45px; font-size: 16px; text-align: center;" type="submit" value="கிரந்த சொற்கள் ({{ count_g }})" id="show2" name="res3" />
               </div>
-            <!-- </div> -->
-          {% endfor %}  
+              <div class="col-12 col-md-4 text-center">
+                      <input type="submit" name="download" id="show3" class="btn btn-sm btn-cl1" 
+                        value="⬇" style="width: 40px; height: 40px; border-radius: 5px; margin-top: 15px;"/>
+              </div>
+          </div>
+      <div class="card-body">
+          <div class="container-sm">
+            <div class="row" id="rwSr">
+                {% for i in data %}
+                <div class="col-12 col-sm-6 col-md-6 border-end border-secondary">
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <label lang="ta" class="fw-bold" style="word-break: break-word; white-space: normal; flex: 1;">{{ i.words }}</label>
+                        <span class="badge text-bg-cl1 rounded-pill ms-2">
+                          <button type="button" class="btn btn-sm btn-cl1" data-bs-toggle="modal" data-bs-target="#doG">
+                            <i class="bi bi-google"></i>
+                          </button>                     
+                          <button type="button" class="btn btn-sm btn-cl1 ms-1 copy-btn" onclick="copyToClipboard(this, '{{ i.words }}')">
+                            <i class="bi bi-clipboard"></i>
+                          </button>
+                        </span>
+                      </li>                                        
+                    </ul>
+                </div>
+                {% endfor %} 
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+  <script > 
+    function copyToClipboard(button, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    button.innerHTML = '<i class="bi bi-check-lg"></i>'; // Change to tick icon
+    setTimeout(() => {
+      button.innerHTML = '<i class="bi bi-clipboard"></i>'; // Revert back after 2 sec
+    }, 2000);
+  }).catch(err => {
+    console.error("Failed to copy text: ", err);
+  });
+}
+    </script>
 
-<script > 
-  const copyBtns = [...document.getElementsByClassName('copy-btn')] 
-  console.log(copyBtns)
-  let previous = null
-  copyBtns.forEach(btn=> btn.addEventListener('click', ()=>{
-    // console.log('click')
-    // let previous = null
-    const color = btn.getAttribute('data-hex')
-    // console.log(color) 
-    // console.log(btn) 
-    navigator.clipboard.writeText(color)
-    btn.style.background = "gray"
-
-    if (previous){      
-      previous.style.background = "#198754"      
-    }
-    previous = btn
-    
-   
-  }))
-
-</script> 
-      
-
-{% endblock %}
-    
- 
+  {% endblock %}
